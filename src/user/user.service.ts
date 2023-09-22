@@ -1,16 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
+import { Injectable } from "@nestjs/common";
+import { User } from "@prisma/client";
+import { PrismaService } from "src/prisma/prisma.service";
+import * as bcrypt from "bcrypt";
+import { JwtStrategy } from "./JWT/jwt.strategy";
+
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly jwtStrategy: JwtStrategy
+  ) {}
 
   async createUser(user: User) {
     const hashedPassword = await bcrypt.hash(
       user.password,
-      process.env.BCRYPT_SALT,
+      10
     );
     const createdUser = await this.prismaService.user.create({
       data: {
@@ -19,8 +24,14 @@ export class UserService {
         password: hashedPassword,
       },
     });
-    return createdUser;
+
+
+    const token = await this.jwtStrategy.generateToken(createdUser); // Generate JWT token
+    return { user: createdUser, token }; // Return user and token
   }
+
+
+  
   async findUser(userCredintials: { email: string; password: string }) {
     const user = await this.prismaService.user.findUnique({
       where: { email: userCredintials.email },
@@ -29,12 +40,13 @@ export class UserService {
       return null;
     }
     const confirmPassword = await bcrypt.compare(
-      user.password,
       userCredintials.password,
+      user.password
     );
     if (!confirmPassword) {
       return null;
     }
-    return user;
+    const token = await this.jwtStrategy.generateToken(user); // Generate JWT token
+    return { user, token }; // Return user and token
   }
 }
