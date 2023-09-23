@@ -4,6 +4,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './user/JWT/jwt.strategy';
+import { AdministratorModule } from './administrator/administrator.module';
 @Module({
   imports: [UserModule, PrismaModule ,
     PassportModule.register({ defaultStrategy: 'jwt' }),
@@ -11,6 +12,7 @@ import { JwtStrategy } from './user/JWT/jwt.strategy';
       secret: process.env.JWT_SECRET, // Use your JWT secret here
       signOptions: { expiresIn: '1h' }, // Token expiration time
     }),
+    AdministratorModule,
   ],
   providers:[JwtStrategy]
 })

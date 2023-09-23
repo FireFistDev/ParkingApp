@@ -50,7 +50,6 @@ model currentParking {
   zoneId    Int         @unique
   carId     Int         @unique
   startTime DateTime
-  endTime   DateTime?
   zone      ParkingZone @relation(fields: [zoneId], references: [id])
   car       Car         @relation(fields: [carId], references: [id])
 }
@@ -59,9 +58,10 @@ model ParkingHistory {
   id        Int         @id @default(autoincrement())
   zoneId    Int
   carId     Int
-  userId    Int
   startTime DateTime
   endTime   DateTime
   zone      ParkingZone @relation(fields: [zoneId], references: [id])
   car       Car         @relation(fields: [carId], references: [id])
 }
+
+
