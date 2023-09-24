@@ -1,44 +1,21 @@
-import { Injectable } from "@nestjs/common";
-import { ParkingZone } from "@prisma/client";
+import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { JwtStrategy } from "src/JWT/jwt.strategy";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class AdministratorService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService,
+      private readonly jwtStrategy: JwtStrategy
+    ) {}
 
-  async createZone(zone: ParkingZone) {
-    await this.prismaService.parkingZone.create({
-      data: {
-        zoneName: zone.zoneName,
-        zoneAddress: zone.zoneAddress,
-        pricePerHour: zone.pricePerHour,
-      },
-    });
-
-    return "zone created Successfully";
-  }
-
-  async getAllZones() {
-    const zones = await this.prismaService.parkingZone.findMany();
-    return zones;
-  }
-
-  async getSingleZone(zoneId: number) {
-    const zones = await this.prismaService.parkingZone.findUnique({
-      where: { id: zoneId },
-    });
-    return zones;
-  }
-
-  async updateZone(zone: ParkingZone) {
-    const zones = await this.prismaService.parkingZone.update({
-      where: { id: zone.id },
-      data: { zoneName: zone.zoneName },
-    });
-    return zones;
-  }
-
-  async deleteZone(zoneId: number) {
-    return this.prismaService.parkingZone.delete({ where: { id: zoneId } });
+  async loginAdmin(admin : {adminName : string,password:string}) : Promise<string> {
+    try {
+      const isAdmin = await this.prismaService.adminisrator.findUnique({where:{adminName:admin.adminName}})
+      if(!isAdmin)  throw  new UnauthorizedException()
+      if(admin.password != isAdmin.password) throw new UnauthorizedException('wrong password')
+      return this.jwtStrategy.generateAdminToken(isAdmin)
+    } catch (error) {
+      throw new BadRequestException(error)
+    }
   }
 }

@@ -1,31 +1,12 @@
-import { Controller, Post, Body, Get , Param, Patch, Delete} from "@nestjs/common";
+import { Controller, Post, Body} from "@nestjs/common";
 import { AdministratorService } from "./administrator.service";
-import { ParkingZone } from "@prisma/client";
-
-@Controller("administrator")
+@Controller("admin")
 export class AdministratorController {
   constructor(private readonly administratorService: AdministratorService) {}
 
-  @Post("create")
-  creteParkingZone(@Body() parkingZone: ParkingZone) {
-    return this.administratorService.createZone(parkingZone);
+  @Post('/admin')
+  loginAdmin(@Body() admin : {adminName : string,password:string} ) : Promise<string>{
+    return this.administratorService.loginAdmin(admin);
   }
-  @Patch('updateZone')
-  updateZone(@Body() parkingZone: ParkingZone) {
-    return this.administratorService.updateZone(parkingZone);
-  }
-  @Delete('deletezone/:id')
-  deleteZone(@Param(':id') zoneId : number) {
-    return this.administratorService.deleteZone(zoneId);
-  }
-  @Get("getzones")
-  getParkingZones() {
-    return this.administratorService.getAllZones();
-  }
-  @Get("getzone/:id")
-  getSingleZone(@Param("id") id: number) {
-    return this.administratorService.getSingleZone(id);
-  }
-
 }
 

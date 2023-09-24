@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { CarModule } from './car/car.module';
-import { JwtStrategy } from './JWT/jwt.strategy';
+import { JwtStrategy } from '../JWT/jwt.strategy';
 import { ParkCarModule } from './park-car/park-car.module';
 
 @Module({

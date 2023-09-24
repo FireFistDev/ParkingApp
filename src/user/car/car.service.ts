@@ -1,38 +1,55 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
+import { CreateCarDto, UpdateCarDto } from "./carDtos/car.dto";
 import { Car } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-import { JwtPayload } from "../JWT/jwt-payload.interface";
 @Injectable()
 export class CarService {
+  
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createCar(car: Car, user : JwtPayload ) {
-    console.log(user)
-    await this.prismaService.car.create({
-      data: {
-        ownerId: user.userId,
-        carName: car.carName,
-        type: car.type,
-        serialNumber: car.serialNumber,
-      },
-    });
-    return 'car created successfully'
+  async createCar(car: CreateCarDto, ownerId: number): Promise<Car> {
+    try {
+      return await this.prismaService.car.create({
+        data: {
+          ownerId,
+          carName: car.carName,
+          type: car.type,
+          serialNumber: car.serialNumber,
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException({message: 'creteCar does not created', error: error});
+    }
   }
-  deleteCar(car: Car) {
-    return this.prismaService.car.delete({
-      where: {
-        id: car.id,
-      },
-    });
+  deleteCar(id: number): Promise<Car> {
+    try {
+      return this.prismaService.car.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException("car does not deleted", error);
+    }
   }
-  updateCar(car: Car) {
-    return this.prismaService.car.update({where:{id: car.id}, data: {carName: car.carName} })
+  updateCar(car: UpdateCarDto): Promise<Car> {
+    try {
+      return this.prismaService.car.update({
+        where: { id: car.id },
+        data: { carName: car.carName },
+      });
+    } catch (error) {
+      throw new BadRequestException("car does not update successfully", error);
+    }
+  }
 
-  }
-
-  getCars(userId: number) {
-    return this.prismaService.car.findMany({where:{ownerId : userId }});
+  getCars(userId: number): Promise<Car[]> {
+    try {
+      return this.prismaService.car.findMany({ where: { ownerId: userId } });
+    } catch (error) {
+      throw new BadRequestException("cars can not be found", error);
+    }
   }
 }

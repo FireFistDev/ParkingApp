@@ -3,7 +3,7 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './user/JWT/jwt.strategy';
+import { JwtStrategy } from './JWT/jwt.strategy';
 import { AdministratorModule } from './administrator/administrator.module';
 @Module({
   imports: [UserModule, PrismaModule ,

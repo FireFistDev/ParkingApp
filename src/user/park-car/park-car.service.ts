@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
-import { JwtStrategy } from "../JWT/jwt.strategy";
+import { JwtStrategy } from "../../JWT/jwt.strategy";
 
 @Injectable()
 export class ParkCarService {

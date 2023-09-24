@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { CarService } from './car.service';
 import { CarController } from './car.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { JwtStrategy } from '../JWT/jwt.strategy';
+import { JwtStrategy } from '../../JWT/jwt.strategy';
 
 @Module({
 

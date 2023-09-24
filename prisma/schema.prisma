@@ -16,13 +16,21 @@ enum CarsType {
   HECHBEACK
 }
 
+model adminisrator {
+  id           Int           @id @default(autoincrement())
+  adminName    String        @unique @default("admin")
+  password     String
+  createdZones ParkingZone[]
+}
+
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  userName String
-  password String
-  balance  Int    @default(100)
-  cars     Car[]
+  id                 Int     @id @default(autoincrement())
+  email              String  @unique
+  userName           String
+  password           String
+  passwordResetToken String?
+  balance            Int     @default(100)
+  cars               Car[]
 }
 
 model Car {
@@ -41,6 +49,8 @@ model ParkingZone {
   zoneName         String           @unique
   zoneAddress      String
   pricePerHour     Int
+  creator          Int
+  createdBy            adminisrator     @relation(fields: [creator], references: [id])
   currentParking   currentParking?
   parkingHistories ParkingHistory[]
 }
@@ -63,5 +73,3 @@ model ParkingHistory {
   zone      ParkingZone @relation(fields: [zoneId], references: [id])
   car       Car         @relation(fields: [carId], references: [id])
 }
-
-
