@@ -16,7 +16,7 @@ enum CarsType {
   HECHBEACK
 }
 
-model adminisrator {
+model Adminisrator {
   id           Int           @id @default(autoincrement())
   adminName    String        @unique @default("admin")
   password     String
@@ -50,7 +50,7 @@ model ParkingZone {
   zoneAddress      String
   pricePerHour     Int
   creator          Int
-  createdBy            adminisrator     @relation(fields: [creator], references: [id])
+  createdBy        Adminisrator     @relation(fields: [creator], references: [id])
   currentParking   currentParking?
   parkingHistories ParkingHistory[]
 }
