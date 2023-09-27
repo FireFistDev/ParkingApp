@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum CarsType {
+enum CarTypes {
   SEDAN
   JEEP
   HECHBEACK
@@ -39,7 +39,7 @@ model Car {
   owner            User             @relation(fields: [ownerId], references: [id])
   carName          String
   serialNumber     String
-  type             CarsType
+  type             CarTypes
   parkedCar        currentParking? // Define the relationship in the Car model
   parkingHistories ParkingHistory[]
 }
@@ -49,8 +49,8 @@ model ParkingZone {
   zoneName         String           @unique
   zoneAddress      String
   pricePerHour     Int
-  creator          Int
-  createdBy        Adminisrator     @relation(fields: [creator], references: [id])
+  creatorId         Int
+  createdBy        Adminisrator     @relation(fields: [creatorId], references: [id])
   currentParking   currentParking?
   parkingHistories ParkingHistory[]
 }
@@ -65,7 +65,7 @@ model currentParking {
 }
 
 model ParkingHistory {
-  id        Int         @id @default(autoincrement())
+  id        Int         @id
   zoneId    Int
   carId     Int
   startTime DateTime

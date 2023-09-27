@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import {  Module } from '@nestjs/common';
 import { ParkingZoneService } from './parking-zone.service';
 import { ParkingZoneController } from './parking-zone.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
@@ -8,5 +8,4 @@ import { PrismaModule } from 'src/prisma/prisma.module';
   providers: [ParkingZoneService, ],
 })
 export class ParkingZoneModule {
-
 }

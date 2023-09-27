@@ -1,6 +1,12 @@
-import { Controller, Post, Body } from "@nestjs/common";
+import { Controller, Post, Body, Param, UseGuards, Req} from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto,LoginUserDto  } from "./userDtos/user.dto";
+import { JwtAuthGuard } from "src/guards/Auth.Guard";
+import { request } from "express";
+import { User } from "@prisma/client";
+interface CustomRequest extends Request {
+  user: User;
+}
 
 @Controller("user")
 export class UserController {
@@ -17,4 +23,15 @@ export class UserController {
     return this.userService.findUser(loginUser);
   }
 
+  @Post('passwordRecovery')
+  requestpasswordRecovery(@Body() email: string ){
+    return this.userService.requestPasswordRecovery(email);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Post('newPassword')
+  requestNewPassword(@Req() req : CustomRequest ,@Body() body : {newPassword : string}) {
+    const userId = req.user.id
+return this.userService.setNewPassword({userId,newPassword : body.newPassword});
+  }
 }
+

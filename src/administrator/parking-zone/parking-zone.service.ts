@@ -8,42 +8,61 @@ import { ParkingZone } from "@prisma/client";
 export class ParkingZoneService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createZone(creator : number , parkingZone: CreateParkingZoneDto): Promise<ParkingZone> {
+  async createZone(
+    creatorId: number,
+    parkingZone: CreateParkingZoneDto
+  ): Promise<ParkingZone> {
     try {
       return await this.prismaService.parkingZone.create({
-        data: { ...parkingZone, creator:1 },
+        data: { ...parkingZone, creatorId },
+      });
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  
+
+  async findAll(): Promise<ParkingZone[]> {
+    try {
+      return await this.prismaService.parkingZone.findMany({
+        include: {
+          parkingHistories: true, // Include all parking histories
+          currentParking: true, // Include the current parking
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async findOne(id: number): Promise<ParkingZone> {
+    try {
+      return await this.prismaService.parkingZone.findUnique({
+        where: { id },
+        include: {
+          parkingHistories: true, // Include all parking histories
+          currentParking: true, // Include the current parking
+        },
       });
     } catch (error) {
       throw new BadRequestException({ error: error.message });
     }
   }
 
-  async findAll() : Promise<ParkingZone[]> {
-    try {
-      return await this.prismaService.parkingZone.findMany();
-    } catch (error) {
-      throw new BadRequestException({ error: error.message });
-    }
-  }
-
-  async findOne(id: number) : Promise<ParkingZone> {
-    try {
-      return await this.prismaService.parkingZone.findUnique({ where: { id } });
-    } catch (error) {
-      throw new BadRequestException({ error: error.message });
-    }
-  }
-
-  update(id: number, updateParkingZoneDto: UpdateParkingZoneDto) : Promise<ParkingZone> {
+  update(
+    id: number,
+    updateParkingZoneDto: UpdateParkingZoneDto
+  ): Promise<ParkingZone> {
     try {
       return this.prismaService.parkingZone.update({
         where: { id },
-        data: { ...updateParkingZoneDto , creator:1 },
+        data: { ...updateParkingZoneDto},
       });
     } catch (error) {}
   }
 
-  remove(id: number) : Promise<ParkingZone> {
+  remove(id: number): Promise<ParkingZone> {
     try {
       return this.prismaService.parkingZone.delete({ where: { id } });
     } catch (error) {

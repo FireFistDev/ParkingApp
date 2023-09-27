@@ -4,6 +4,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import * as bcrypt from "bcrypt";
 import { JwtStrategy } from "../JWT/jwt.strategy";
 import { CreateUserDto, LoginUserDto  } from "./userDtos/user.dto";
+import { User } from "@prisma/client";
 @Injectable()
 export class UserService {
   constructor(
@@ -49,4 +50,29 @@ export class UserService {
     }
   }
 
+  async requestPasswordRecovery(email : string){
+    try {
+
+      const user = await this.prismaService.user.findUnique({where:{email:email}})
+      if(!user) throw new UnauthorizedException({messge : "user not found"});
+      const token  = this.jwtStrategy.generateToken(user)
+      this.sendMail()
+      return token
+    } catch (error) {
+      throw new BadRequestException(error)
+    }
+  }
+
+  sendMail(){
+
+  }
+
+  async setNewPassword(data:{userId : number,newPassword: string}){
+    try {
+      const hashedPassword = await bcrypt.hash(data.newPassword, 10);
+      return await this.prismaService.user.update({where: {id: data.userId},data: {password: hashedPassword}})
+    } catch (error) {
+      throw new BadRequestException(error)
+    }
+  }
 }

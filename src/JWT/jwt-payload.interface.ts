@@ -3,4 +3,5 @@ export interface JwtPayload {
     email: string;
     userName: string;
     balance:number;
+    token? : string;
   }

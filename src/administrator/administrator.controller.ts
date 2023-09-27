@@ -4,7 +4,7 @@ import { AdministratorService } from "./administrator.service";
 export class AdministratorController {
   constructor(private readonly administratorService: AdministratorService) {}
 
-  @Post('/admin')
+  @Post('/login')
   loginAdmin(@Body() admin : {adminName : string,password:string} ) : Promise<string>{
     return this.administratorService.loginAdmin(admin);
   }
