@@ -11,7 +11,7 @@ export interface CustomRequest extends Request {
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post("register")
+  @Post('/register')
   registerUser(@Body() user: CreateUserDto) : Promise<string> {
     return this.userService.createUser(user);
   }
