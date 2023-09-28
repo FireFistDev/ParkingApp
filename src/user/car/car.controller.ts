@@ -5,36 +5,34 @@ import { Car  } from '@prisma/client';
 import { JwtAuthGuard } from '../../guards/Auth.Guard';
 import { JwtPayload } from '../../JWT/jwt-payload.interface';
 import { Request } from 'express'
-import { UpdateCarDto } from './carDtos/car.dto';
-interface CustomRequest extends Request {
+import { CreateCarDto, UpdateCarDto } from './carDtos/car.dto';
+export interface CustomRequestCar extends Request {
   user: JwtPayload; // Assuming JwtPayload is a valid type/interface
 }
 @Controller('car')
 export class CarController {
   constructor(private readonly carService: CarService) {}
 
-  @Post('/create')
+  @Post()
   @UseGuards(JwtAuthGuard)
-
-  createCar(@Req() req : CustomRequest) {
-    const userPayload = req.user.userId
-    const car= req.body;
-    return this.carService.createCar(car, userPayload);
+  createCar(@Req() req : CustomRequestCar) :Promise<Car> {
+    const userId : number = req.user.userId
+    const car : CreateCarDto= req.body;
+    return this.carService.createCar(car, userId);
   }
   @Delete('/delete')
   @UseGuards(JwtAuthGuard)
   deleteCar(@Body() carId: number):Promise<Car> {
     return this.carService.deleteCar(carId);
   }
-  @Get('/getcars')
+  @Get()
   @UseGuards(JwtAuthGuard)
-  getUserCars(@Req() req : CustomRequest ): Promise<Car[]>{
+  getUserCars(@Req() req : CustomRequestCar ): Promise<Car[]>{
     const userId = req.user.userId
     return this.carService.getCars(userId);
   }
-  @Patch('update')
+  @Patch()
   @UseGuards(JwtAuthGuard)
-
   updateCar(@Body() car: UpdateCarDto)  :Promise<Car>  {
     return this.carService.updateCar(car);
   }

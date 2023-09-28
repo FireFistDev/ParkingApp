@@ -14,14 +14,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload) {
-        console.log(payload)
+  async validate(payload : JwtPayload) {
     if (!payload) {
-      throw new UnauthorizedException('token is not authorized');
     }
-    const decoded = jwt.verify(payload.token, process.env.JWT_SECRET);
-
-    return decoded;
+      return payload
   }
 
   async generateToken(user: User): Promise<string> {
@@ -32,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       balance: user.balance,
     };
     return jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "1h", // Adjust token expiration as needed
+      expiresIn: process.env.JWT_EXPIRES_TIME, // Adjust token expiration as needed
     });
   }
   async generateAdminToken(admin :Adminisrator): Promise<string> {
@@ -41,7 +37,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       adminName : admin.adminName
     };
     return jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "1h", // Adjust token expiration as needed
+      expiresIn: process.env.JWT_EXPIRES_TIME, // Adjust token expiration as needed
     });
   }
 }

@@ -3,19 +3,21 @@ import { ParkingZoneService } from './parking-zone.service';
 import { CreateParkingZoneDto } from './parkingZoneDtos/create-parking-zone.dto';
 import { UpdateParkingZoneDto } from './parkingZoneDtos/update-parking-zone.dto';
 import { ParkingZone, Adminisrator } from '@prisma/client';
-import { JwtAuthGuard } from 'src/guards/Auth.Guard';
+import { JwtAuthGuard } from '../../guards/Auth.Guard';
 import { Request } from 'express'
-interface CustomRequest extends Request {
+export interface CustomRequest extends Request {
   user: Adminisrator;
 }
 @Controller('parking-zone')
 export class ParkingZoneController {
+
+
   constructor(private readonly parkingZoneService: ParkingZoneService) {}
 
 //  creating a new zone with jwts autentification
   @UseGuards(JwtAuthGuard)
   @Post()
-  creteZone(@Req() req : CustomRequest ):Promise<ParkingZone> {
+  createZone(@Req() req : CustomRequest ):Promise<ParkingZone> {
     const creatorId =  req.user.id
     const parkingZone :CreateParkingZoneDto = req.body;
     return this.parkingZoneService.createZone(creatorId, parkingZone);

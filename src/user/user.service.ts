@@ -1,10 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
 import * as bcrypt from "bcrypt";
 import { JwtStrategy } from "../JWT/jwt.strategy";
-import { CreateUserDto, LoginUserDto  } from "./userDtos/user.dto";
-import { User } from "@prisma/client";
+import { CreateUserDto, LoginUserDto } from "./userDtos/user.dto";
+import { userErrors } from "../errors/expectedErrors";
 @Injectable()
 export class UserService {
   constructor(
@@ -14,7 +18,7 @@ export class UserService {
 
   async createUser(user: CreateUserDto): Promise<string> {
     try {
-      const hashedPassword = await bcrypt.hash(user.password, 10);
+      const hashedPassword = await bcrypt.hash(user.password, +process.env.BCRYPT_SALT); // hashing password to save database
       const createdUser = await this.prismaService.user.create({
         data: {
           email: user.email,
@@ -24,55 +28,64 @@ export class UserService {
       });
       return await this.jwtStrategy.generateToken(createdUser); // Generate JWT token
     } catch (error) {
-      throw new BadRequestException({error});
+      throw new BadRequestException({
+        message: userErrors.USER_NOT_CREATE,
+        error: error.message,
+      });
     }
   }
 
-  async findUser(loginUser: LoginUserDto ): Promise<string> {
+  async findUser(loginUser: LoginUserDto): Promise<string> {
     try {
       const user = await this.prismaService.user.findUnique({
         where: { email: loginUser.email },
       });
       if (!user) {
-        throw new UnauthorizedException({messge : "wrong credintials"});
+        throw new UnauthorizedException(userErrors.USER_NOT_FOUND)
       }
       const confirmPassword = await bcrypt.compare(
         loginUser.password,
         user.password
       );
       if (!confirmPassword) {
-        throw new UnauthorizedException({messge : "wrong credintials"});
+        throw new UnauthorizedException(userErrors.WRONG_PASSWORD);
       }
       // Generate JWT token
       return await this.jwtStrategy.generateToken(user);
     } catch (error) {
-      throw new BadRequestException({error});
+      throw new BadRequestException({
+        error: error.message
+      });
     }
   }
 
-  async requestPasswordRecovery(email : string){
+  async requestPasswordRecovery(email: string) {
     try {
-
-      const user = await this.prismaService.user.findUnique({where:{email:email}})
-      if(!user) throw new UnauthorizedException({messge : "user not found"});
-      const token  = this.jwtStrategy.generateToken(user)
-      this.sendMail()
-      return token
+      const user = await this.prismaService.user.findUnique({
+        where: { email: email },
+      });
+      if (!user)
+        throw new UnauthorizedException({ message: userErrors.USER_NOT_FOUND });
+      const token = this.jwtStrategy.generateToken(user);
+      return token;
     } catch (error) {
-      throw new BadRequestException(error)
+      throw new BadRequestException(error);
     }
   }
 
-  sendMail(){
-
-  }
-
-  async setNewPassword(data:{userId : number,newPassword: string}){
+  async setNewPassword(data: { userId: number; newPassword: string }) {
     try {
       const hashedPassword = await bcrypt.hash(data.newPassword, 10);
-      return await this.prismaService.user.update({where: {id: data.userId},data: {password: hashedPassword}})
+      const user =  await this.prismaService.user.update({
+        where: { id: data.userId },
+        data: { password: hashedPassword },
+      });
+      return   this.jwtStrategy.generateToken(user);
     } catch (error) {
-      throw new BadRequestException(error)
+      throw new BadRequestException({
+        message: userErrors.SOMETHING_WRONG,
+        error: error.message,
+      });
     }
   }
 }

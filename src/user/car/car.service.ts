@@ -3,7 +3,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { CreateCarDto, UpdateCarDto } from "./carDtos/car.dto";
 import { Car } from "@prisma/client";
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "../../prisma/prisma.service";
 @Injectable()
 export class CarService {
   
@@ -52,4 +52,6 @@ export class CarService {
       throw new BadRequestException("cars can not be found", error);
     }
   }
+
+  
 }

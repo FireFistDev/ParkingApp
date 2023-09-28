@@ -28,7 +28,6 @@ model User {
   email              String  @unique
   userName           String
   password           String
-  passwordResetToken String?
   balance            Int     @default(100)
   cars               Car[]
 }

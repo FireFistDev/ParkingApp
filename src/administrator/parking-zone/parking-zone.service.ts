@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { CreateParkingZoneDto } from "./parkingZoneDtos/create-parking-zone.dto";
 import { UpdateParkingZoneDto } from "./parkingZoneDtos/update-parking-zone.dto";
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "../../prisma/prisma.service";
 import { ParkingZone } from "@prisma/client";
 
 @Injectable()

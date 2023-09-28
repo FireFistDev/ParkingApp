@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ParkingEventService } from './parking-event.service';
 import { ParkingEventController } from './parking-event.controller';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports:[PrismaModule],
